@@ -37,8 +37,12 @@ IFTTT_KEY_FILE="${WORKTREE_GITFLOW_IFTTT_KEY_FILE:-$HOME/.claude/ifttt-key.txt}"
 if command -v jq >/dev/null 2>&1; then
   dir="$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)"
 else
-  dir="$(printf '%s' "$input" | sed -n 's/.*"cwd"*: *"\([^"]*\)".*/\1/p' | head -1)"
+  dir="$(printf '%s' "$input" | sed -n 's/.*"cwd" *: *"\([^"]*\)".*/\1/p' | head -1)"
 fi
+
+# Escape a string for safe embedding in JSON output (branch prefix is
+# user-controlled and may contain quotes/backslashes).
+json_esc() { local s="${1//\\/\\\\}"; printf '%s' "${s//\"/\\\"}"; }
 [ -z "$dir" ] && dir="$PWD"
 dir="${dir//\\\\//}"   # JSON-escaped backslashes -> /
 dir="${dir//\\//}"     # plain backslashes -> /
@@ -95,7 +99,7 @@ notify_user() {
     ' >/dev/null 2>&1 || true
   elif command -v osascript >/dev/null 2>&1; then
     # macOS notification center.
-    t="${title//\"/\\\"}"; b="${body//\"/\\\"}"
+    t="$(json_esc "$title")"; b="$(json_esc "$body")"
     osascript -e "display notification \"$b\" with title \"$t\"" >/dev/null 2>&1 || true
   elif command -v notify-send >/dev/null 2>&1; then
     # Linux desktop notification.
@@ -105,10 +109,13 @@ notify_user() {
   # Applet trigger: event $IFTTT_EVENT; value1=repo, value2=branch, value3=detail.
   if [ -s "$IFTTT_KEY_FILE" ]; then
     key="$(tr -d '[:space:]' < "$IFTTT_KEY_FILE")"
-    curl -fsS -m 10 "https://maker.ifttt.com/trigger/$IFTTT_EVENT/with/key/$key" \
-      --data-urlencode "value1=$repo_name" \
-      --data-urlencode "value2=${branch:-detached}" \
-      --data-urlencode "value3=$body" >/dev/null 2>&1 || true
+    event="$(printf '%s' "$IFTTT_EVENT" | tr -cd 'A-Za-z0-9_-')"
+    # URL via --config on stdin so the key never appears in process arguments.
+    printf 'url = "https://maker.ifttt.com/trigger/%s/with/key/%s"\n' "$event" "$key" | \
+      curl -fsS -m 10 --config - \
+        --data-urlencode "value1=$repo_name" \
+        --data-urlencode "value2=${branch:-detached}" \
+        --data-urlencode "value3=$body" >/dev/null 2>&1 || true
   fi
 }
 
@@ -139,9 +146,12 @@ rename)
     worktree-*) new="${PREFIX}${branch#worktree-}" ;;
     *) new="${PREFIX}${branch}" ;;
   esac
+  b="$(json_esc "$branch")"; n="$(json_esc "$new")"; r="$(json_esc "$refork")"
   if git -C "$dir" branch -m "$branch" "$new" 2>/dev/null; then
     printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Gitflow guardrail: the worktree branch was renamed from %s to %s%s. Use %s for all git operations from now on and when reporting results."},"systemMessage":"gitflow: worktree branch renamed to %s%s"}\n' \
-      "$branch" "$new" "$refork" "$new" "$new" "$refork"
+      "$b" "$n" "$r" "$n" "$n" "$r"
+  else
+    printf '{"systemMessage":"gitflow: could not rename %s to %s (target may already exist); branch name kept"}\n' "$b" "$n"
   fi
   ;;
 notify|end)

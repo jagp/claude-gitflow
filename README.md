@@ -29,7 +29,7 @@ when the work is done. This plugin fixes all three:
 ## Installation
 
 ```
-/plugin marketplace add <github-user>/worktree-gitflow
+/plugin marketplace add jagp/worktree-gitflow
 /plugin install worktree-gitflow@worktree-gitflow
 ```
 
@@ -48,7 +48,7 @@ claude --plugin-dir /path/to/worktree-gitflow
 |------|-------|--------------|
 | rename | `PostToolUse` on `EnterWorktree` | Renames `worktree-<name>` → `feature/<name>`. If the branch is *fresh* (a single `branch: Created from ...` reflog entry), hard-resets it onto the base branch first. Worktrees that already carry commits are never reset. |
 | notify | `Stop` (async) | If the worktree is clean and HEAD moved since the last alert, sends the desktop notification + IFTTT webhook. Deduped by commit SHA — one alert per batch of new work, not per turn. |
-| release | `SessionEnd` | Sends any pending alert, then detaches the worktree HEAD so the feature branch is free in your main checkout. |
+| end | `SessionEnd` | Sends any pending alert, then detaches the worktree HEAD (releases the branch) so it is free in your main checkout. |
 
 Everything is scoped to directories under `.claude/worktrees/` — the hooks
 never touch your own branches or checkouts. The script always exits 0; a
