@@ -1,0 +1,41 @@
+{
+  "description": "Gitflow guardrails for Claude Code worktrees: rename worktree branches to feature/*, fork from develop, notify when committed work is ready, and release branches at session end so your git client can use them.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "EnterWorktree",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gitflow.sh\" rename",
+            "timeout": 30,
+            "statusMessage": "gitflow: renaming worktree branch"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gitflow.sh\" notify",
+            "timeout": 30,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gitflow.sh\" end",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
