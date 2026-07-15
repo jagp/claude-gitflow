@@ -1,5 +1,5 @@
 {
-  "name": "worktree-gitflow",
+  "name": "claude-gitflow",
   "version": "0.1.0",
   "description": "Gitflow guardrails for Claude Code worktrees: feature/* branch naming, always forking from develop, desktop + IFTTT notifications when work is ready, and automatic local branch release at session end (your repo is the remote — nothing is pushed).",
   "author": {

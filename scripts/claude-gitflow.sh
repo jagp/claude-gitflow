@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# worktree-gitflow — gitflow guardrails for Claude Code worktrees.
+# claude-gitflow — gitflow guardrails for Claude Code worktrees.
 #
 # Subcommands (wired in hooks/hooks.json):
 #   rename  PostToolUse[EnterWorktree]  rename the worktree branch to <prefix><name> and,
@@ -16,11 +16,11 @@
 # Releasing the branch locally IS the delivery.
 #
 # Configuration (env vars, e.g. via "env" in settings.json):
-#   WORKTREE_GITFLOW_PREFIX          branch prefix        (default: feature/)
-#   WORKTREE_GITFLOW_BASE            base branch to fork  (default: auto-detect
+#   CLAUDE_GITFLOW_PREFIX          branch prefix        (default: feature/)
+#   CLAUDE_GITFLOW_BASE            base branch to fork  (default: auto-detect
 #                                    develop, dev, origin/develop, origin/dev)
-#   WORKTREE_GITFLOW_IFTTT_EVENT     IFTTT Maker event    (default: claude_work_done)
-#   WORKTREE_GITFLOW_IFTTT_KEY_FILE  IFTTT key location   (default: ~/.claude/ifttt-key.txt)
+#   CLAUDE_GITFLOW_IFTTT_EVENT     IFTTT Maker event    (default: claude_work_done)
+#   CLAUDE_GITFLOW_IFTTT_KEY_FILE  IFTTT key location   (default: ~/.claude/ifttt-key.txt)
 #
 # Guardrails must never break a session: this script always exits 0 and only
 # ever touches directories under .claude/worktrees/.
@@ -28,10 +28,10 @@ set -u
 mode="${1:-notify}"
 input="$(cat 2>/dev/null || true)"
 
-PREFIX="${WORKTREE_GITFLOW_PREFIX:-feature/}"
-BASE_OVERRIDE="${WORKTREE_GITFLOW_BASE:-}"
-IFTTT_EVENT="${WORKTREE_GITFLOW_IFTTT_EVENT:-claude_work_done}"
-IFTTT_KEY_FILE="${WORKTREE_GITFLOW_IFTTT_KEY_FILE:-$HOME/.claude/ifttt-key.txt}"
+PREFIX="${CLAUDE_GITFLOW_PREFIX:-feature/}"
+BASE_OVERRIDE="${CLAUDE_GITFLOW_BASE:-}"
+IFTTT_EVENT="${CLAUDE_GITFLOW_IFTTT_EVENT:-claude_work_done}"
+IFTTT_KEY_FILE="${CLAUDE_GITFLOW_IFTTT_KEY_FILE:-$HOME/.claude/ifttt-key.txt}"
 
 # --- resolve the worktree directory from hook input (fallback: process cwd) --
 if command -v jq >/dev/null 2>&1; then

@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gitflow.sh\" rename",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/claude-gitflow.sh\" rename",
             "timeout": 30,
             "statusMessage": "gitflow: renaming worktree branch"
           }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gitflow.sh\" notify",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/claude-gitflow.sh\" notify",
             "timeout": 30,
             "async": true
           }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/worktree-gitflow.sh\" end",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/claude-gitflow.sh\" end",
             "timeout": 30
           }
         ]

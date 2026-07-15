@@ -1,12 +1,12 @@
 {
-  "name": "worktree-gitflow",
+  "name": "claude-gitflow",
   "owner": {
     "name": "Jared Parmenter",
     "email": "jared.parmenter@gmail.com"
   },
   "plugins": [
     {
-      "name": "worktree-gitflow",
+      "name": "claude-gitflow",
       "source": "./",
       "description": "Gitflow guardrails for Claude Code worktrees: feature/* branch naming, always forking from develop, desktop + IFTTT notifications when work is ready, and automatic local branch release at session end."
     }

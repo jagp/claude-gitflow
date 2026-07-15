@@ -1,4 +1,4 @@
-# worktree-gitflow
+# claude-gitflow
 
 Gitflow guardrails for [Claude Code](https://claude.com/claude-code) worktrees.
 
@@ -29,14 +29,14 @@ when the work is done. This plugin fixes all three:
 ## Installation
 
 ```
-/plugin marketplace add jagp/worktree-gitflow
-/plugin install worktree-gitflow@worktree-gitflow
+/plugin marketplace add jagp/claude-gitflow
+/plugin install claude-gitflow@claude-gitflow
 ```
 
 Or test locally:
 
 ```
-claude --plugin-dir /path/to/worktree-gitflow
+claude --plugin-dir /path/to/claude-gitflow
 ```
 
 > If you previously wired similar hooks directly into `~/.claude/settings.json`,
@@ -61,10 +61,10 @@ All optional, via environment variables (e.g. the `"env"` block in
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `WORKTREE_GITFLOW_PREFIX` | `feature/` | Branch prefix for renamed worktree branches |
-| `WORKTREE_GITFLOW_BASE` | auto | Base branch to fork from. Auto-detect order: `develop`, `dev`, `origin/develop`, `origin/dev`. If none exist, worktrees keep their default base. |
-| `WORKTREE_GITFLOW_IFTTT_EVENT` | `claude_work_done` | IFTTT Maker Webhooks event name |
-| `WORKTREE_GITFLOW_IFTTT_KEY_FILE` | `~/.claude/ifttt-key.txt` | Where your IFTTT Maker key lives |
+| `CLAUDE_GITFLOW_PREFIX` | `feature/` | Branch prefix for renamed worktree branches |
+| `CLAUDE_GITFLOW_BASE` | auto | Base branch to fork from. Auto-detect order: `develop`, `dev`, `origin/develop`, `origin/dev`. If none exist, worktrees keep their default base. |
+| `CLAUDE_GITFLOW_IFTTT_EVENT` | `claude_work_done` | IFTTT Maker Webhooks event name |
+| `CLAUDE_GITFLOW_IFTTT_KEY_FILE` | `~/.claude/ifttt-key.txt` | Where your IFTTT Maker key lives |
 
 ### IFTTT setup (optional)
 
