@@ -4,11 +4,15 @@
     "name": "Jared Parmenter",
     "email": "jared.parmenter@gmail.com"
   },
+  "metadata": {
+    "description": "Marketplace for https://github.com/jagp, author of claude-gitflow."
+  },
   "plugins": [
     {
       "name": "claude-gitflow",
       "source": "./",
-      "description": "Gitflow guardrails for Claude Code worktrees: feature/* branch naming, always forking from develop, desktop + IFTTT notifications when work is ready, and automatic local branch release at session end."
+      "version": "0.1.0",
+      "description": "Guardrails ensuring Claude operates in Gitflow best practices (naming conventions, branch base, event emitting, branch wrap up)"
     }
   ]
 }
