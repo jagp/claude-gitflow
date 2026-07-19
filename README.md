@@ -1,6 +1,8 @@
 # claude-gitflow
 
-Gitflow guardrails for [Claude Code](https://claude.com/claude-code) worktrees.
+v0.0.1
+
+Gitflow guardrails for Claude Code
 
 Claude Code isolates background and parallel work in git worktrees on internal
 `worktree-*` branches. Those branches don't follow gitflow naming, stay checked
@@ -31,15 +33,9 @@ when the work is done. This plugin fixes all three:
 
 ## Installation
 
-```
+```install
 /plugin marketplace add jagp/claude-gitflow
 /plugin install claude-gitflow@claude-gitflow
-```
-
-Or test locally:
-
-```
-claude --plugin-dir /path/to/claude-gitflow
 ```
 
 > If you previously wired similar hooks directly into `~/.claude/settings.json`,
@@ -47,11 +43,11 @@ claude --plugin-dir /path/to/claude-gitflow
 
 ## How it works
 
-| Hook | Event | What it does |
-|------|-------|--------------|
-| rename | `PostToolUse` on `EnterWorktree` | Renames `worktree-<name>` → `feature/<name>`. If the branch is *fresh* (a single `branch: Created from ...` reflog entry), hard-resets it onto the base branch first. Worktrees that already carry commits are never reset. |
-| notify | `Stop` (async) | If the worktree is clean and HEAD moved since the last alert, sends the desktop notification + IFTTT webhook. Deduped by commit SHA — one alert per batch of new work, not per turn. |
-| end | `SessionEnd` | Sends any pending alert, then detaches the worktree HEAD (releases the branch) so it is free in your main checkout. |
+| Hook   | Event                            | What it does                                                                                                                                                                                                                |
+| ------ | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rename | `PostToolUse` on `EnterWorktree` | Renames `worktree-<name>` → `feature/<name>`. If the branch is _fresh_ (a single `branch: Created from ...` reflog entry), hard-resets it onto the base branch first. Worktrees that already carry commits are never reset. |
+| notify | `Stop` (async)                   | If the worktree is clean and HEAD moved since the last alert, sends the desktop notification + IFTTT webhook. Deduped by commit SHA — one alert per batch of new work, not per turn.                                        |
+| end    | `SessionEnd`                     | Sends any pending alert, then detaches the worktree HEAD (releases the branch) so it is free in your main checkout.                                                                                                         |
 
 Everything is scoped to directories under `.claude/worktrees/` — the hooks
 never touch your own branches or checkouts. The script always exits 0; a
@@ -62,12 +58,12 @@ guardrail must never break a session.
 All optional, via environment variables (e.g. the `"env"` block in
 `~/.claude/settings.json`):
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `CLAUDE_GITFLOW_PREFIX` | `feature/` | Branch prefix for renamed worktree branches |
-| `CLAUDE_GITFLOW_BASE` | auto | Base branch to fork from. Auto-detect order: `develop`, `dev`, `origin/develop`, `origin/dev`. If none exist, worktrees keep their default base. |
-| `CLAUDE_GITFLOW_IFTTT_EVENT` | `claude_work_done` | IFTTT Maker Webhooks event name |
-| `CLAUDE_GITFLOW_IFTTT_KEY_FILE` | `~/.claude/ifttt-key.txt` | Where your IFTTT Maker key lives |
+| Variable                        | Default                   | Purpose                                                                                                                                          |
+| ------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CLAUDE_GITFLOW_PREFIX`         | `feature/`                | Branch prefix for renamed worktree branches                                                                                                      |
+| `CLAUDE_GITFLOW_BASE`           | auto                      | Base branch to fork from. Auto-detect order: `develop`, `dev`, `origin/develop`, `origin/dev`. If none exist, worktrees keep their default base. |
+| `CLAUDE_GITFLOW_IFTTT_EVENT`    | `claude_work_done`        | IFTTT Maker Webhooks event name                                                                                                                  |
+| `CLAUDE_GITFLOW_IFTTT_KEY_FILE` | `~/.claude/ifttt-key.txt` | Where your IFTTT Maker key lives                                                                                                                 |
 
 ### IFTTT setup (optional)
 
