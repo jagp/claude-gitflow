@@ -108,7 +108,7 @@ notify_user() {
   # IFTTT Maker webhook — enabled by dropping your key in $IFTTT_KEY_FILE.
   # Applet trigger: event $IFTTT_EVENT; value1=repo, value2=branch, value3=detail.
   if [ -s "$IFTTT_KEY_FILE" ]; then
-    key="$(tr -d '[:space:]' < "$IFTTT_KEY_FILE")"
+    key="$(tr -cd 'A-Za-z0-9_-' < "$IFTTT_KEY_FILE")"
     event="$(printf '%s' "$IFTTT_EVENT" | tr -cd 'A-Za-z0-9_-')"
     # URL via --config on stdin so the key never appears in process arguments.
     printf 'url = "https://maker.ifttt.com/trigger/%s/with/key/%s"\n' "$event" "$key" | \

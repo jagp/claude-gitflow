@@ -25,6 +25,9 @@ when the work is done. This plugin fixes all three:
 - git ≥ 2.31
 - bash (on Windows: Git Bash, which ships with Git for Windows)
 - `jq` optional (a sed fallback is built in)
+- a recent Claude Code — the rename hook matches the `EnterWorktree` tool and
+  the notify hook uses `async` Stop hooks. Older versions degrade gracefully:
+  no rename, and alerts run synchronously.
 
 ## Installation
 
@@ -74,6 +77,10 @@ All optional, via environment variables (e.g. the `"env"` block in
    Ingredients: `value1` = repo name, `value2` = branch, `value3` = detail text.
 
 No key file → the webhook is silently skipped.
+
+Keep the key file private (`chmod 600 ~/.claude/ifttt-key.txt` on macOS/Linux).
+When a key is present, each alert sends the repo name, branch name, and alert
+text to IFTTT — nothing else, and nothing at all without a key file.
 
 ## Reviewing and merging Claude's work
 
