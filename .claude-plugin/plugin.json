@@ -1,7 +1,7 @@
 {
   "name": "claude-gitflow",
   "version": "0.1.0",
-  "description": "Guardrails ensuring Claude operates in Gitflow best practices (naming conventions, branch base, event emitting, branch wrap up)",
+  "description": "Ensuring Claude worktrees conform to Gitflow regulations (naming conventions, branch base, event emitting, clean up)",
   "author": {
     "name": "Jared Parmenter",
     "email": "jared.parmenter@gmail.com"
@@ -14,7 +14,7 @@
     "gitflow",
     "worktree",
     "hooks",
-    "notifications",
-    "workflow"
+    "git workflow",
+    "workflows"
   ]
 }
