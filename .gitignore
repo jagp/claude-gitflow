@@ -1,4 +1,3 @@
 .trunk/
 .claude/ifttt-key.txt
-.claude/worktrees/claude-md
-.claude/worktrees/finish-branch-command
+.claude/worktrees/
