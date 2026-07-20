@@ -2,9 +2,9 @@
   <img src="assets/logo.png" width="240" alt="A brass regulator valve wrapped in a sunburst, sitting at the junction where a dotted side branch rejoins the straight main line of a git pipe-tree carrying water drops">
 </p>
 
-# claude-gitflow
+# cc-gitflow-regulator
 
-v0.0.1
+v0.2.1
 
 Gitflow guardrails for Claude Code — every worktree flows back through the regulator.
 
@@ -13,6 +13,8 @@ Claude Code isolates background and parallel work in git worktrees on internal
 out inside the worktree (so Sourcetree/GitKraken/git can't check them out —
 `fatal: '<branch>' is already used by worktree at ...`), and nothing tells you
 when the work is done. This plugin fixes all three:
+
+
 
 - **Gitflow naming** — the moment a worktree is created, its branch is renamed
   to `feature/<name>`.
@@ -43,8 +45,8 @@ when the work is done. This plugin fixes all three:
 ## Installation
 
 ```install
-/plugin marketplace add jagp/claude-gitflow
-/plugin install claude-gitflow@claude-gitflow
+/plugin marketplace add jagp/cc-gitflow-regulator
+/plugin install cc-gitflow-regulator@cc-gitflow-regulator
 ```
 
 > If you previously wired similar hooks directly into `~/.claude/settings.json`,
@@ -69,10 +71,10 @@ All optional, via environment variables (e.g. the `"env"` block in
 
 | Variable                        | Default                   | Purpose                                                                                                                                          |
 | ------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `CLAUDE_GITFLOW_PREFIX`         | `feature/`                | Branch prefix for renamed worktree branches                                                                                                      |
-| `CLAUDE_GITFLOW_BASE`           | auto                      | Base branch to fork from. Auto-detect order: `develop`, `dev`, `origin/develop`, `origin/dev`. If none exist, worktrees keep their default base. |
-| `CLAUDE_GITFLOW_IFTTT_EVENT`    | `claude_work_done`        | IFTTT Maker Webhooks event name                                                                                                                  |
-| `CLAUDE_GITFLOW_IFTTT_KEY_FILE` | `~/.claude/ifttt-key.txt` | Where your IFTTT Maker key lives                                                                                                                 |
+| `CC_GITFLOW_REGULATOR_PREFIX`         | `feature/`                | Branch prefix for renamed worktree branches                                                                                                      |
+| `CC_GITFLOW_REGULATOR_BASE`           | auto                      | Base branch to fork from. Auto-detect order: `develop`, `dev`, `origin/develop`, `origin/dev`. If none exist, worktrees keep their default base. |
+| `CC_GITFLOW_REGULATOR_IFTTT_EVENT`    | `claude_work_done`        | IFTTT Maker Webhooks event name                                                                                                                  |
+| `CC_GITFLOW_REGULATOR_IFTTT_KEY_FILE` | `~/.claude/ifttt-key.txt` | Where your IFTTT Maker key lives                                                                                                                 |
 
 ### IFTTT setup (optional)
 
@@ -111,7 +113,7 @@ clean — then:
    worktree holding the branch (worktrees you created yourself are never
    touched).
 2. **Merges** the branch into the base (`develop`/`dev`, or
-   `CLAUDE_GITFLOW_BASE`) with `--no-ff`, gitflow-style.
+   `CC_GITFLOW_REGULATOR_BASE`) with `--no-ff`, gitflow-style.
 3. **On conflict**, switches to the PR route: pushes the branch and opens a
    PR into the base — the only case where anything leaves your machine, and
    it never happens without you having invoked the command. The PR body

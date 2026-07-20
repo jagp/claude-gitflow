@@ -1,14 +1,14 @@
 {
-  "name": "claude-gitflow",
-  "version": "0.1.1",
+  "name": "cc-gitflow-regulator",
+  "version": "0.2.1",
   "description": "Ensuring Claude worktrees conform to Gitflow regulations (naming conventions, branch base, event emitting, clean up)",
   "author": {
     "name": "Jared Parmenter",
     "email": "jared.parmenter@gmail.com"
   },
   "license": "MIT",
-  "homepage": "https://github.com/jagp/claude-gitflow",
-  "repository": "https://github.com/jagp/claude-gitflow",
+  "homepage": "https://github.com/jagp/cc-gitflow-regulator",
+  "repository": "https://github.com/jagp/cc-gitflow-regulator",
   "keywords": [
     "git",
     "gitflow",
