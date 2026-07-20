@@ -1,8 +1,8 @@
-# claude-gitflow
+# cc-gitflow-regulator
 
 ## Layout
 
-- `scripts/claude-gitflow.sh` — all logic. Subcommands `rename` / `notify` / `end`
+- `scripts/cc-gitflow-regulator.sh` — all logic. Subcommands `rename` / `notify` / `end`
 - `scripts/finish-branch.sh` - wrap-up, handles killing session & removing cruft
 - `hooks/hooks.json` — wires subcommands to `PostToolUse[EnterWorktree]`, `Stop` (async), `SessionEnd`.
 
