@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# claude-gitflow — gitflow guardrails for Claude Code worktrees.
+# cc-gitflow-regulator — gitflow guardrails for Claude Code worktrees.
 #
 # Subcommands (wired in hooks/hooks.json):
 #   rename  PostToolUse[EnterWorktree]  rename the worktree branch to <prefix><name> and,
@@ -16,11 +16,11 @@
 # Releasing the branch locally IS the delivery.
 #
 # Configuration (env vars, e.g. via "env" in settings.json):
-#   CLAUDE_GITFLOW_PREFIX          branch prefix        (default: feature/)
-#   CLAUDE_GITFLOW_BASE            base branch to fork  (default: auto-detect
+#   CC_GITFLOW_REGULATOR_PREFIX          branch prefix        (default: feature/)
+#   CC_GITFLOW_REGULATOR_BASE            base branch to fork  (default: auto-detect
 #                                    develop, dev, origin/develop, origin/dev)
-#   CLAUDE_GITFLOW_IFTTT_EVENT     IFTTT Maker event    (default: claude_work_done)
-#   CLAUDE_GITFLOW_IFTTT_KEY_FILE  IFTTT key location   (default: ~/.claude/ifttt-key.txt)
+#   CC_GITFLOW_REGULATOR_IFTTT_EVENT     IFTTT Maker event    (default: claude_work_done)
+#   CC_GITFLOW_REGULATOR_IFTTT_KEY_FILE  IFTTT key location   (default: ~/.claude/ifttt-key.txt)
 #
 # Guardrails must never break a session: this script always exits 0 and only
 # ever touches directories under .claude/worktrees/.
@@ -28,10 +28,10 @@ set -u
 mode="${1:-notify}"
 input="$(cat 2>/dev/null || true)"
 
-PREFIX="${CLAUDE_GITFLOW_PREFIX:-feature/}"
-BASE_OVERRIDE="${CLAUDE_GITFLOW_BASE:-}"
-IFTTT_EVENT="${CLAUDE_GITFLOW_IFTTT_EVENT:-claude_work_done}"
-IFTTT_KEY_FILE="${CLAUDE_GITFLOW_IFTTT_KEY_FILE:-$HOME/.claude/ifttt-key.txt}"
+PREFIX="${CC_GITFLOW_REGULATOR_PREFIX:-feature/}"
+BASE_OVERRIDE="${CC_GITFLOW_REGULATOR_BASE:-}"
+IFTTT_EVENT="${CC_GITFLOW_REGULATOR_IFTTT_EVENT:-claude_work_done}"
+IFTTT_KEY_FILE="${CC_GITFLOW_REGULATOR_IFTTT_KEY_FILE:-$HOME/.claude/ifttt-key.txt}"
 
 # --- resolve the worktree directory from hook input (fallback: process cwd) --
 if command -v jq >/dev/null 2>&1; then
@@ -58,12 +58,23 @@ common="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev
 repo_root="${common%/.git}"
 repo_name="$(basename "$repo_root")"
 wtname="$(basename "$dir")"
-stampdir="$common/claude-gitflow"
+stampdir="$common/cc-gitflow-regulator"
 stampfile="$stampdir/notified-$wtname"
 
 stamp_head() {
   mkdir -p "$stampdir" 2>/dev/null || return 0
   git -C "$dir" rev-parse HEAD 2>/dev/null > "$stampfile" || true
+}
+
+# Keep .claude/worktrees/ out of the index: a `git add -A` run inside the repo
+# would otherwise record each worktree as a gitlink, leaving the main checkout
+# permanently "dirty" and blocking /finish-branch. info/exclude is per-clone,
+# so the user's repo needs no committed .gitignore change.
+ensure_worktrees_excluded() {
+  ex="$common/info/exclude"
+  mkdir -p "$common/info" 2>/dev/null || return 0
+  grep -qs '^\.claude/worktrees/$' "$ex" 2>/dev/null && return 0
+  printf '.claude/worktrees/\n' >> "$ex" 2>/dev/null || true
 }
 
 # Gitflow base branch: explicit override first, then common conventions.
@@ -121,6 +132,7 @@ notify_user() {
 
 case "$mode" in
 rename)
+  ensure_worktrees_excluded
   # Gitflow: features always fork from the base branch. Only a FRESH worktree
   # branch is re-pointed (exactly one reflog entry, "branch: Created from ..."),
   # so a re-entered worktree that already carries commits is never reset.
