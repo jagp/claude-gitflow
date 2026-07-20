@@ -4,7 +4,7 @@
 
 # cc-gitflow-regulator
 
-v0.0.1
+v0.2.1
 
 Gitflow guardrails for Claude Code — every worktree flows back through the regulator.
 
