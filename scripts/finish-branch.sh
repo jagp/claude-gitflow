@@ -55,6 +55,9 @@ resolve_branch() {
     for c in "$b" "${PREFIX}${b}" "feature/$b" "bugfix/$b" "hotfix/$b"; do
       if G show-ref --verify -q "refs/heads/$c"; then printf '%s' "$c"; return 0; fi
     done
+    echo "candidates:" >&2
+    G for-each-ref --format='%(refname:short)' \
+      "refs/heads/${PREFIX}" refs/heads/feature refs/heads/bugfix refs/heads/hotfix | sort -u >&2
     return 1
   fi
   # no argument: current branch if it looks like a gitflow work branch
@@ -146,6 +149,13 @@ if [ "$mode" = "plan" ]; then
     lk=""; [ "$wt_locked" = "1" ] && lk=", git-locked"
     slf=""; [ "$wt_is_self" = "1" ] && slf=" (this session's own worktree)"
     echo "plan: worktree      $wt_dir ($st$lk)$slf"
+    if [ "$st" = "DIRTY" ]; then
+      if [ "$ahead" = "0" ]; then
+        echo "plan: NOTE          uncommitted worktree changes are NOT in $base — --delete-branch will DISCARD them"
+      else
+        echo "plan: NOTE          worktree is DIRTY — finish will refuse until the work is committed"
+      fi
+    fi
   else
     echo "plan: worktree      none — branch is not checked out anywhere"
   fi
@@ -172,14 +182,24 @@ fi
 # ============================== finish =======================================
 # Phase 1: preflight — never start a merge we may not be able to complete.
 # -uno: untracked files (e.g. .claude/worktrees/ itself) never block a finish;
-# tracked modifications do.
-[ -n "$(G status --porcelain -uno 2>/dev/null)" ] \
+# tracked modifications do. .claude/worktrees is excluded entirely: worktrees
+# accidentally committed as gitlinks (git add -A) must not brick the finish.
+[ -n "$(G status --porcelain -uno -- . ':(exclude).claude/worktrees' 2>/dev/null)" ] \
   && fail "main checkout has uncommitted changes — commit or stash them first"
 G rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1 \
   && fail "main checkout has a merge in progress"
+wt_discard=0
 if [ -n "$wt_dir" ]; then
-  [ -n "$(git -C "$wt_dir" status --porcelain 2>/dev/null)" ] \
-    && fail "worktree $wt_dir has uncommitted changes — the branch is not finished"
+  if [ -n "$(git -C "$wt_dir" status --porcelain 2>/dev/null)" ]; then
+    # Dirty means unfinished — except when the branch is already contained in
+    # the base and the user consented to --delete-branch: the leftovers go
+    # with the worktree (the /finish-branch consent prompt spells this out).
+    if [ "$ahead" != "0" ] || [ "$delete_branch" != "1" ]; then
+      fail "worktree $wt_dir has uncommitted changes — the branch is not finished"
+    fi
+    wt_discard=1
+    echo "warn: worktree has uncommitted changes — discarding them with the worktree (--delete-branch on an already-merged branch)"
+  fi
   [ "$wt_is_managed" = "1" ] \
     || fail "worktree $wt_dir was not created by Claude — release it yourself, then re-run"
 fi

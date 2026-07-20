@@ -66,6 +66,17 @@ stamp_head() {
   git -C "$dir" rev-parse HEAD 2>/dev/null > "$stampfile" || true
 }
 
+# Keep .claude/worktrees/ out of the index: a `git add -A` run inside the repo
+# would otherwise record each worktree as a gitlink, leaving the main checkout
+# permanently "dirty" and blocking /finish-branch. info/exclude is per-clone,
+# so the user's repo needs no committed .gitignore change.
+ensure_worktrees_excluded() {
+  ex="$common/info/exclude"
+  mkdir -p "$common/info" 2>/dev/null || return 0
+  grep -qs '^\.claude/worktrees/$' "$ex" 2>/dev/null && return 0
+  printf '.claude/worktrees/\n' >> "$ex" 2>/dev/null || true
+}
+
 # Gitflow base branch: explicit override first, then common conventions.
 detect_base() {
   if [ -n "$BASE_OVERRIDE" ]; then
@@ -121,6 +132,7 @@ notify_user() {
 
 case "$mode" in
 rename)
+  ensure_worktrees_excluded
   # Gitflow: features always fork from the base branch. Only a FRESH worktree
   # branch is re-pointed (exactly one reflog entry, "branch: Created from ..."),
   # so a re-entered worktree that already carries commits is never reset.
