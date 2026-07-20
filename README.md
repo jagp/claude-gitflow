@@ -1,8 +1,12 @@
+<p align="center">
+  <img src="assets/logo.png" width="240" alt="A brass regulator valve wrapped in a sunburst, sitting at the junction where a dotted side branch rejoins the straight main line of a git pipe-tree carrying water drops">
+</p>
+
 # claude-gitflow
 
 v0.0.1
 
-Gitflow guardrails for Claude Code
+Gitflow guardrails for Claude Code — every worktree flows back through the regulator.
 
 Claude Code isolates background and parallel work in git worktrees on internal
 `worktree-*` branches. Those branches don't follow gitflow naming, stay checked
