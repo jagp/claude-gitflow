@@ -1,0 +1,68 @@
+---
+description: "Finish a gitflow branch (Sourcetree-style): merge into develop with --no-ff, release the worktree lock, optionally kill the attached session and delete the branch — destructive steps confirmed first."
+argument-hint: "[branch] [--kill-session] [--delete-branch]"
+allowed-tools: ["Bash(bash:*)", "Bash(git:*)", "Bash(gh:*)"]
+---
+
+# /finish-branch
+
+All logic is deterministic and lives in `scripts/finish-branch.sh` — do not
+improvise git commands. Your job is only: run the plan, obtain consent for the
+destructive flags, run finish, relay the output.
+
+## 1. Plan (read-only)
+
+Run:
+
+```
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/finish-branch.sh" plan $ARGUMENTS
+```
+
+Show the user the plan output verbatim. If it errors (exit 2), stop and report
+— do not work around it.
+
+## 2. Consent for destructive flags
+
+Two flags are destructive and default OFF:
+
+- `--kill-session` — kills the Claude session attached to the branch's
+  worktree and deletes its job directory
+- `--delete-branch` — removes the worktree and deletes the local branch
+
+For each flag, include it in step 3 only if ONE of these holds:
+
+1. The user passed the flag themselves in the `/finish-branch` invocation —
+   that is the explicit permission signal.
+2. The **immediately preceding** conversation clearly shows the user already
+   understands and has approved that exact action (e.g. they just answered a
+   permission prompt or question amounting to the same thing). Older or vaguer
+   mentions do not count.
+3. Neither applies → ask now (AskUserQuestion, one question per flag, default
+   No) and include the flag only on an explicit Yes.
+
+Never substitute your own judgment that deletion "seems fine" — the gate is
+the user's signal, not the state of the repo.
+
+## 3. Finish
+
+Run (with only the consented flags):
+
+```
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/finish-branch.sh" finish <branch> [--kill-session] [--delete-branch]
+```
+
+## 4. Report
+
+Relay the script's summary lines. Exit codes:
+
+- `0` — finished; report merge commit, and what was/wasn't cleaned up
+- `2` — refused by a preflight guard; report the reason verbatim, fix nothing
+- `3` — merge conflicted; the script already pushed the branch and opened a PR
+  (the only path that pushes, and it never happens without the user having
+  invoked this command). This is the normal two-step conflict process, not a
+  failure: the PR body itself reminds the user that after the PR merges they
+  run `/finish-branch <branch>` again, and the resumed run detects the branch
+  is contained in the base and performs the remaining cleanup only. Relay the
+  PR URL and say exactly that
+- `4` — merged, but cleanup incomplete (e.g. branch not deletable); report the
+  warnings verbatim
